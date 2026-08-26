@@ -197,4 +197,16 @@ public class Window extends JFrame {
             hpSound.stop();
         }
     }
+
+    public void potionSound() {
+        try {
+            File audiofile = new File("assets/wav/potion.wav");
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audiofile);
+            hpSound = AudioSystem.getClip();
+            hpSound.open(audioStream);
+            hpSound.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+    }
 }

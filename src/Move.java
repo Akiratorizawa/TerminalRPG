@@ -3,7 +3,7 @@ package TerminalRPG_v3.src;
 public class Move {
     private String move;
     private int power;
-    private int pp;
+    public int pp;
     private double accuracy;
     private Type type;
 

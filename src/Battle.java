@@ -17,7 +17,7 @@ public class Battle extends JFrame implements KeyListener {
     // Initializing paint elements
     private Window window;
     private Image background;
-    private Image bag;
+    private Image bagImage;
 
     private Image cursor;
     private Image bagArrow;
@@ -27,6 +27,9 @@ public class Battle extends JFrame implements KeyListener {
     
     private Pokemon player;
     private Pokemon opponent;
+
+    private Bag items;
+    private Bag pokeballs;
 
     private Image playerSprite;
     private Image opponentSprite;
@@ -54,6 +57,7 @@ public class Battle extends JFrame implements KeyListener {
         FIGHT_BAG_RUN,
         PLAYER_RUN,
         BAG_ITEMS,
+        POTION_USED,
         CHOOSE_MOVE,
         PLAYER_MOVE,
         OPPONENT_MOVE,
@@ -97,6 +101,22 @@ public class Battle extends JFrame implements KeyListener {
         // Getting the two pokemon's sprites
         playerSprite = spriteFetcher(String.valueOf(player.id()), "player");
         opponentSprite = spriteFetcher(String.valueOf(opponent.id()), "opponent");
+
+        // Creating bag
+        Image potionImage = new ImageIcon("assets/img/super_potion.png").getImage();
+        Item superPotion = new Item("Super Potion", potionImage, 3);
+
+        Image pokeballImage = new ImageIcon("assets/img/super_potion.png").getImage();
+        Item pokeball = new Item("Pokeball", pokeballImage, 3);
+
+        ArrayList<Item> itemsTemp = new ArrayList<>();
+        ArrayList<Item> pokeballsTemp = new ArrayList<>();
+
+        itemsTemp.add(superPotion);
+        pokeballsTemp.add(pokeball);
+
+        items = new Bag(itemsTemp);
+        pokeballs = new Bag(pokeballsTemp);
 
         // Initializing the fonts
         try {
@@ -196,10 +216,10 @@ public class Battle extends JFrame implements KeyListener {
                 }
 
                 else if (battleState == BattleState.BAG_ITEMS) {
-                    bag = new ImageIcon("assets/img/bag.png").getImage();
+                    bagImage = new ImageIcon("assets/img/bag.png").getImage();
                     bagArrow = new ImageIcon("assets/img/red_arrow.png").getImage();
 
-                    g.drawImage(bag, 0, 0, getWidth(), getHeight(), this);
+                    g.drawImage(bagImage, 0, 0, getWidth(), getHeight(), this);
 
                     g.setFont(biggerPokemon);
                     g.setColor(Color.BLACK);
@@ -210,7 +230,24 @@ public class Battle extends JFrame implements KeyListener {
 
                     g.drawString("Items", 875, 65);
                     g.drawImage(bagArrow, 950, 29, 100, 50, this);
-            
+
+                    for (int i = 0; i < items.items().size(); i++) {
+                        if (items.items().get(i).quantity > 0) {
+                            int yCoordinate = 90;
+                            Item item = items.items().get(i);
+
+                            g.drawImage(item.image(), 800, yCoordinate, 40, 40, this);
+                            g.drawString(item.quantity() + " - " + item.name(), 850, yCoordinate + 35);
+
+                            g.drawImage(cursor, 750, yCoordinate, 40, 40, this);
+
+                            yCoordinate += 50;
+                        }
+                    }
+                }
+
+                else if (battleState == BattleState.POTION_USED) {
+                    g.drawString("You used a Super Potion.", 100, 600);
                 }
 
                 else if (battleState == BattleState.PLAYER_RUN) {
@@ -376,6 +413,7 @@ public class Battle extends JFrame implements KeyListener {
                 }
 
                 else if (optionChoice == 1) {
+                    optionChoice = 0;
                     battleState = BattleState.BAG_ITEMS;
 
                     window.repaint();
@@ -418,11 +456,28 @@ public class Battle extends JFrame implements KeyListener {
                 return;
             }
 
+            else if (battleState == BattleState.BAG_ITEMS) {
+                if (optionChoice == 0) {
+                    window.confirmSound();
+                    potionUsed();
+                }
+            }
+
             else {
                 return;
             }
 
         } 
+
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            if (battleState == BattleState.CHOOSE_MOVE || battleState == BattleState.BAG_ITEMS) {
+                optionChoice = 0;
+                battleState = BattleState.FIGHT_BAG_RUN;
+
+                window.backSound();
+                window.repaint();
+            }
+        }
 
     }
 
@@ -581,6 +636,7 @@ public class Battle extends JFrame implements KeyListener {
             }
 
             else if (battleState == BattleState.PLAYER_IMMUNE) {
+                optionChoice = 0;
                 enterBattleState(BattleState.FIGHT_BAG_RUN);
             }
 
@@ -645,6 +701,61 @@ public class Battle extends JFrame implements KeyListener {
 
         battleTimer.setRepeats(false);
         battleTimer.start();
+    }
+
+    public void potionUsed() {
+        battleState = BattleState.POTION_USED;
+        items.items().get(0).quantity -= 1;
+
+        window.repaint();
+
+        Timer potionDialogueTimer = new Timer(1500, e -> {
+            if (player.hp != playerMaxHp) {
+                window.potionSound();
+            }
+
+            player.hp += 50;
+
+            if (player.hp > playerMaxHp) {
+                player.hp = playerMaxHp;
+            }
+
+            window.repaint();
+
+            Timer toOpponentMove = new Timer (1500, er -> {
+                lastMove = opponent.moves.get(ThreadLocalRandom.current().nextInt(0, 4));
+
+                double multiplier = effectiveCheck(lastMove, player);
+
+                int damage = damageCalculation(lastMove, player);
+
+                player.hp -= damage;
+
+                if (player.hp <  0) {
+                    player.hp = 0;
+                }
+
+                if (multiplier < 1 && multiplier != 0) {
+                    window.notVeryEffectiveSound();
+                }
+
+                else if (multiplier > 1) {
+                    window.superEffectiveSound();
+                }
+
+                else if (multiplier == 1) {
+                    window.attackSound();
+                }
+
+                enterBattleState(BattleState.OPPONENT_MOVE);
+            });
+
+            toOpponentMove.setRepeats(false);
+            toOpponentMove.start();
+        });
+
+        potionDialogueTimer.setRepeats(false);
+        potionDialogueTimer.start();
     }
 }
 
