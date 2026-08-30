@@ -50,14 +50,21 @@ public class Battle extends JFrame implements KeyListener {
     private Font pokemonMoves;
 
     private Timer battleTimer;
+
     private boolean playerTurn;
+    private boolean pokemonCaught;
 
     private enum BattleState {
         BATTLE_INTRO,
         FIGHT_BAG_RUN,
         PLAYER_RUN,
         BAG_ITEMS,
+        BAG_POKEBALLS,
         POTION_USED,
+        POKEBALL_USED,
+        POKEBALL_SHAKE,
+        POKEBALL_CAUGHT,
+        POKEBALL_BROKE,
         CHOOSE_MOVE,
         PLAYER_MOVE,
         OPPONENT_MOVE,
@@ -106,8 +113,8 @@ public class Battle extends JFrame implements KeyListener {
         Image potionImage = new ImageIcon("assets/img/super_potion.png").getImage();
         Item superPotion = new Item("Super Potion", potionImage, 3);
 
-        Image pokeballImage = new ImageIcon("assets/img/super_potion.png").getImage();
-        Item pokeball = new Item("Pokeball", pokeballImage, 3);
+        Image pokeballImage = new ImageIcon("assets/img/pokeball.png").getImage();
+        Item pokeball = new Item("Pokeball", pokeballImage, 1);
 
         ArrayList<Item> itemsTemp = new ArrayList<>();
         ArrayList<Item> pokeballsTemp = new ArrayList<>();
@@ -161,7 +168,8 @@ public class Battle extends JFrame implements KeyListener {
                     g.drawImage(playerSprite, 260, 250, 230, 230, this);
                 }
 
-                if (battleState != BattleState.OPPONENT_FAINT && battleState != BattleState.PLAYER_WIN) {
+                if (battleState != BattleState.OPPONENT_FAINT && battleState != BattleState.PLAYER_WIN && 
+                    battleState != BattleState.POKEBALL_USED && battleState != BattleState.POKEBALL_CAUGHT && battleState != BattleState.POKEBALL_SHAKE) {
                     g.drawImage(opponentSprite, 800, 70, 235, 235, this);
                 }
 
@@ -217,7 +225,7 @@ public class Battle extends JFrame implements KeyListener {
 
                 else if (battleState == BattleState.BAG_ITEMS) {
                     bagImage = new ImageIcon("assets/img/bag.png").getImage();
-                    bagArrow = new ImageIcon("assets/img/red_arrow.png").getImage();
+                    bagArrow = new ImageIcon("assets/img/right_red_arrow.png").getImage();
 
                     g.drawImage(bagImage, 0, 0, getWidth(), getHeight(), this);
 
@@ -242,12 +250,75 @@ public class Battle extends JFrame implements KeyListener {
                             g.drawImage(cursor, 750, yCoordinate, 40, 40, this);
 
                             yCoordinate += 50;
+
+                            g.drawImage(item.image(), 52, 320, 100, 100, this);
+
+                            g.drawString("A spray-type wound medicine.", 36, 500);
+                            g.drawString("It restores the HP of one Pokemon", 36, 550);
+                            g.drawString("by 50 points.", 36, 600);
+                        }
+                    }
+                }
+
+                else if (battleState == BattleState.BAG_POKEBALLS) {
+                    bagImage = new ImageIcon("assets/img/bag.png").getImage();
+                    bagArrow = new ImageIcon("assets/img/left_red_arrow.png").getImage();
+
+                    g.drawImage(bagImage, 0, 0, getWidth(), getHeight(), this);
+
+                    g.setFont(biggerPokemon);
+                    g.setColor(Color.BLACK);
+
+                    g.drawString("BAG", 295, 95);
+
+                    g.setFont(smallerPokemon);
+
+                    g.drawString("Pokeballs", 875, 65);
+                    g.drawImage(bagArrow, 800, 29, 100, 50, this);
+
+                    for (int i = 0; i < pokeballs.items().size(); i++) {
+                        if (pokeballs.items().get(i).quantity > 0) {
+                            int yCoordinate = 90;
+                            Item item = pokeballs.items().get(i);
+
+                            g.drawImage(item.image(), 840, yCoordinate, -40, 40, this);
+                            g.drawString(item.quantity() + " - " + item.name(), 850, yCoordinate + 35);
+
+                            g.drawImage(cursor, 750, yCoordinate, 40, 40, this);
+
+                            yCoordinate += 50;
+
+                            g.drawImage(item.image(), 52, 320, 100, 100, this);
+
+                            g.drawString("A ball thrown to catch a wild Pokemon.", 36, 500);
+                            g.drawString("It is designed in a capsule style.", 36, 550);
                         }
                     }
                 }
 
                 else if (battleState == BattleState.POTION_USED) {
                     g.drawString("You used a Super Potion.", 100, 600);
+                }
+
+                else if (battleState == BattleState.POKEBALL_USED) {
+                    g.drawString("You used a Pokeball.", 100, 600);
+                    g.drawImage(pokeballs.items().get(0).image(), 870, 205, 70, 70, this);
+                }
+
+                else if (battleState == BattleState.POKEBALL_SHAKE) {
+                    Image tiltedPokeball = new ImageIcon("assets/img/pokeballtilt.png").getImage();
+
+                    g.drawString("You used a Pokeball.", 100, 600);
+                    g.drawImage(tiltedPokeball, 870, 205, 55, 55, this);
+                }
+
+                else if (battleState == BattleState.POKEBALL_CAUGHT) {
+                    g.drawString("Gotcha! " + opponent.name() + " was caught!", 100, 600);
+                    g.drawImage(pokeballs.items().get(0).image(), 870, 205, 70, 70, this);
+                }
+
+                else if (battleState == BattleState.POKEBALL_BROKE) {
+                    g.drawString("Oh no! The Pokemon broke free!", 100, 600);
                 }
 
                 else if (battleState == BattleState.PLAYER_RUN) {
@@ -302,6 +373,9 @@ public class Battle extends JFrame implements KeyListener {
 
                 else if (battleState == BattleState.PLAYER_WIN) {
                     window.playWinMusic();
+                    if (pokemonCaught == true) {
+                        g.drawImage(pokeballs.items().get(0).image(), 870, 205, 70, 70, this);
+                    }
                     g.drawString("You won the fight! Returning in 5 seconds...", 80, 600);
                 }
 
@@ -355,6 +429,14 @@ public class Battle extends JFrame implements KeyListener {
 
                 window.repaint();
             }
+
+            else if (battleState == BattleState.BAG_POKEBALLS) {
+                optionChoice = 0;
+                battleState = BattleState.BAG_ITEMS;
+
+                window.optionSound();
+                window.repaint();
+            }
         }
 
 
@@ -389,8 +471,16 @@ public class Battle extends JFrame implements KeyListener {
 
                 window.repaint();
             }
-        }
 
+            else if (battleState == BattleState.BAG_ITEMS) {
+                optionChoice = 0;
+                battleState = BattleState.BAG_POKEBALLS;
+
+                window.optionSound();
+                window.repaint();
+            }
+
+        }
 
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
             
@@ -457,9 +547,16 @@ public class Battle extends JFrame implements KeyListener {
             }
 
             else if (battleState == BattleState.BAG_ITEMS) {
-                if (optionChoice == 0) {
+                if (optionChoice == 0 && items.items().get(0).quantity > 0) {
                     window.confirmSound();
                     potionUsed();
+                }
+            }
+
+            else if (battleState == BattleState.BAG_POKEBALLS) {
+                if (optionChoice == 0 && pokeballs.items().get(0).quantity > 0) {
+                    window.confirmSound();
+                    pokeballUsed();
                 }
             }
 
@@ -470,7 +567,7 @@ public class Battle extends JFrame implements KeyListener {
         } 
 
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            if (battleState == BattleState.CHOOSE_MOVE || battleState == BattleState.BAG_ITEMS) {
+            if (battleState == BattleState.CHOOSE_MOVE || battleState == BattleState.BAG_ITEMS || battleState == BattleState.BAG_POKEBALLS) {
                 optionChoice = 0;
                 battleState = BattleState.FIGHT_BAG_RUN;
 
@@ -722,7 +819,7 @@ public class Battle extends JFrame implements KeyListener {
 
             window.repaint();
 
-            Timer toOpponentMove = new Timer (1500, er -> {
+            Timer toOpponentMove = new Timer (2500, er -> {
                 lastMove = opponent.moves.get(ThreadLocalRandom.current().nextInt(0, 4));
 
                 double multiplier = effectiveCheck(lastMove, player);
@@ -756,6 +853,121 @@ public class Battle extends JFrame implements KeyListener {
 
         potionDialogueTimer.setRepeats(false);
         potionDialogueTimer.start();
+    }
+
+    public void pokeballUsed() {
+        battleState = BattleState.POKEBALL_USED;
+        pokeballs.items().get(0).quantity -= 1;
+
+        window.repaint();
+
+        Timer firstShake = new Timer(1000, e -> {
+            battleState = BattleState.POKEBALL_SHAKE;
+            window.pokeballShakeSound();
+            window.repaint();
+
+            Timer neutral = new Timer(500, er -> {
+                battleState = BattleState.POKEBALL_USED;
+                window.repaint();
+
+                Timer secondShake = new Timer(1000, er1 -> {
+                    battleState = BattleState.POKEBALL_SHAKE;
+                    window.pokeballShakeSound();
+                    window.repaint();
+
+                    double random = Math.random();
+
+                    if (random >= 0.60) {
+                        pokemonCaught = true;
+                    }
+
+
+                    if (pokemonCaught == true) {
+                        Timer toCaught = new Timer(1000, er2 -> {
+                            battleState = BattleState.POKEBALL_CAUGHT;
+                            window.pokemonCaught();
+                            window.stopBattleMusic();
+
+                            window.repaint();
+
+                            Timer caughtDialogueTimer = new Timer(4000, er3 -> {
+                                battleState = BattleState.PLAYER_WIN;
+                                window.repaint();
+
+                                Timer backToMenu = new Timer(5000, er4 -> {
+                                    window.removeKeyListener(this);
+                                    window.showMainMenu();
+                                });
+
+                                backToMenu.setRepeats(false);
+                                backToMenu.start();
+                            });
+
+                            caughtDialogueTimer.setRepeats(false);
+                            caughtDialogueTimer.start();
+                        });
+
+                        toCaught.setRepeats(false);
+                        toCaught.start();
+                    }
+
+                    else {
+                        Timer pokeballBroke = new Timer(1000, er2 -> {
+                            battleState = BattleState.POKEBALL_BROKE;
+                            window.repaint();
+
+                            Timer toOpponentMove = new Timer(2500, er3 -> {
+
+                                lastMove = opponent.moves.get(ThreadLocalRandom.current().nextInt(0, 4));
+
+                                double multiplier = effectiveCheck(lastMove, player);
+                                int damage = damageCalculation(lastMove, player);
+
+                                player.hp -= damage;
+
+                                if (player.hp <  0) {
+                                    player.hp = 0;
+                                }
+
+                                if (multiplier < 1 && multiplier != 0) {
+                                    window.notVeryEffectiveSound();
+                                }
+
+                                else if (multiplier > 1) {
+                                    window.superEffectiveSound();
+                                }
+
+                                else if (multiplier == 1) {
+                                    window.attackSound();
+                                }
+
+                                enterBattleState(BattleState.OPPONENT_MOVE);
+
+                            });
+
+                            toOpponentMove.setRepeats(false);
+                            toOpponentMove.start();
+                        
+                        });
+
+                        pokeballBroke.setRepeats(false);
+                        pokeballBroke.start();
+                    }
+
+                });
+
+                secondShake.setRepeats(false);
+                secondShake.start();
+            });
+
+            neutral.setRepeats(false);
+            neutral.start();
+
+        });
+
+        firstShake.setRepeats(false);
+        firstShake.start();
+
     }
 }
 

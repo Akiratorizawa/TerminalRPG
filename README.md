@@ -15,7 +15,7 @@ This repo also contains version 3 of TerminalRPG, as
 
 1. The first version was terminal-based
 2. The second version had a working GUI, but without super effective and not very effective dialogue, code was also a mess
-3. The current version includes super effective and not very effective dialogue, a working bag with potions and Pokeballs (that is in progress), and a massive refactoring as to the state tracking and display system.
+3. The current version includes super effective and not very effective dialogue, a working bag with potions and Pokeballs, and a massive refactoring as to the state tracking and display system.
 
 ## Usage
 From the folder that the repo is present in,

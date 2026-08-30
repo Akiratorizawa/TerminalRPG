@@ -58,7 +58,7 @@ public class Window extends JFrame {
             menuMusic = AudioSystem.getClip();
             menuMusic.open(audioStream);
             FloatControl volume = (FloatControl) menuMusic.getControl(FloatControl.Type.MASTER_GAIN);
-            volume.setValue(-25.0f);
+            volume.setValue(-10.0f);
             menuMusic.loop(Clip.LOOP_CONTINUOUSLY);
             menuMusic.start();
         } catch (Exception e) {
@@ -74,7 +74,7 @@ public class Window extends JFrame {
             battleMusic = AudioSystem.getClip();
             battleMusic.open(audioStream);
             FloatControl volume = (FloatControl) battleMusic.getControl(FloatControl.Type.MASTER_GAIN);
-            volume.setValue(-25.0f);
+            volume.setValue(-10.0f);
             battleMusic.start();
         } catch (Exception e) {
             e.printStackTrace();
@@ -133,7 +133,7 @@ public class Window extends JFrame {
             winMusic = AudioSystem.getClip();
             winMusic.open(audioStream);
             FloatControl volume = (FloatControl) winMusic.getControl(FloatControl.Type.MASTER_GAIN);
-            volume.setValue(-25.0f);
+            volume.setValue(-10.0f);
             winMusic.start();
         } catch (Exception e) {
             e.printStackTrace();
@@ -204,9 +204,45 @@ public class Window extends JFrame {
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(audiofile);
             hpSound = AudioSystem.getClip();
             hpSound.open(audioStream);
+            FloatControl volume = (FloatControl) hpSound.getControl(FloatControl.Type.MASTER_GAIN);
+            volume.setValue(-10.0f);
             hpSound.start();
         } catch (Exception e) {
             e.printStackTrace();
         } 
+    }
+
+    public void pokeballShakeSound() {
+        try {
+            File audiofile = new File("assets/wav/pokeballshake.wav");
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audiofile);
+            hpSound = AudioSystem.getClip();
+            hpSound.open(audioStream);
+            FloatControl volume = (FloatControl) hpSound.getControl(FloatControl.Type.MASTER_GAIN);
+            volume.setValue(-10.0f);
+            hpSound.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+    }
+
+    public void pokemonCaught() {
+        try {
+            File audiofile = new File("assets/wav/pokemonCaught.wav");
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audiofile);
+            hpSound = AudioSystem.getClip();
+            hpSound.open(audioStream);
+            FloatControl volume = (FloatControl) hpSound.getControl(FloatControl.Type.MASTER_GAIN);
+            volume.setValue(-10.0f);
+            hpSound.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+    }
+
+    public void stopBattleMusic() {
+        if (battleMusic != null && battleMusic.isRunning()) {
+            battleMusic.stop();
+        }
     }
 }
