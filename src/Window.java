@@ -218,8 +218,6 @@ public class Window extends JFrame {
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(audiofile);
             hpSound = AudioSystem.getClip();
             hpSound.open(audioStream);
-            FloatControl volume = (FloatControl) hpSound.getControl(FloatControl.Type.MASTER_GAIN);
-            volume.setValue(-10.0f);
             hpSound.start();
         } catch (Exception e) {
             e.printStackTrace();
@@ -232,8 +230,6 @@ public class Window extends JFrame {
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(audiofile);
             hpSound = AudioSystem.getClip();
             hpSound.open(audioStream);
-            FloatControl volume = (FloatControl) hpSound.getControl(FloatControl.Type.MASTER_GAIN);
-            volume.setValue(-10.0f);
             hpSound.start();
         } catch (Exception e) {
             e.printStackTrace();
@@ -244,5 +240,29 @@ public class Window extends JFrame {
         if (battleMusic != null && battleMusic.isRunning()) {
             battleMusic.stop();
         }
+    }
+
+    public void faintSound() {
+        try {
+            File audiofile = new File("assets/wav/faint.wav");
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audiofile);
+            hpSound = AudioSystem.getClip();
+            hpSound.open(audioStream);
+            hpSound.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
+    }
+
+    public void pokeballThrowSound() {
+        try {
+            File audiofile = new File("assets/wav/pokeballThrow.wav");
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audiofile);
+            hpSound = AudioSystem.getClip();
+            hpSound.open(audioStream);
+            hpSound.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } 
     }
 }

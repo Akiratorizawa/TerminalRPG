@@ -6,7 +6,6 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.io.File;
-import java.lang.StackWalker.Option;
 
 import static TerminalRPG_v3.src.Database.pokemonFetcher;
 import static TerminalRPG_v3.src.Database.spriteFetcher;
@@ -27,6 +26,7 @@ public class Battle extends JFrame implements KeyListener {
     
     private Pokemon player;
     private Pokemon opponent;
+    private Pokemon target;
 
     private Bag items;
     private Bag pokeballs;
@@ -40,6 +40,8 @@ public class Battle extends JFrame implements KeyListener {
     private Move lastMove;
 
     private int optionChoice;
+
+    private int pokeballShakes;
     
     private int[] fightBagRunOptionsX = {580, 820, 1000};
     private int[] moveOptionsX = {100, 370, 640, 915};
@@ -52,7 +54,7 @@ public class Battle extends JFrame implements KeyListener {
     private Timer battleTimer;
 
     private boolean playerTurn;
-    private boolean pokemonCaught;
+    private boolean pokemonCaught = false;
 
     private enum BattleState {
         BATTLE_INTRO,
@@ -114,7 +116,7 @@ public class Battle extends JFrame implements KeyListener {
         Item superPotion = new Item("Super Potion", potionImage, 3);
 
         Image pokeballImage = new ImageIcon("assets/img/pokeball.png").getImage();
-        Item pokeball = new Item("Pokeball", pokeballImage, 1);
+        Item pokeball = new Item("Pokeball", pokeballImage, 3);
 
         ArrayList<Item> itemsTemp = new ArrayList<>();
         ArrayList<Item> pokeballsTemp = new ArrayList<>();
@@ -364,10 +366,12 @@ public class Battle extends JFrame implements KeyListener {
                 }
 
                 else if (battleState == BattleState.PLAYER_FAINT) {
+                    window.faintSound();
                     g.drawString(player.name() + " has fainted...", 100, 600);
                 }
 
                 else if (battleState == BattleState.OPPONENT_FAINT) {
+                    window.faintSound();
                     g.drawString(opponent.name() + " has fainted...", 100, 600);
                 }
 
@@ -518,31 +522,9 @@ public class Battle extends JFrame implements KeyListener {
 
             else if (battleState == BattleState.CHOOSE_MOVE) {
                 window.confirmSound();
-
-                lastMove = player.moves.get(optionChoice);
-
-                double multiplier = effectiveCheck(lastMove, opponent);
-                int damage = damageCalculation(lastMove, opponent);
-
-                opponent.hp -= damage;
-
-                if (opponent.hp < 0) {
-                    opponent.hp = 0;
-                }
-                
-                if (multiplier < 1 && multiplier != 0) {
-                    window.notVeryEffectiveSound();
-                }
-
-                else if (multiplier > 1) {
-                    window.superEffectiveSound();
-                }
-
-                else if (multiplier != 0) {
-                    window.attackSound();
-                }
-
-                enterBattleState(BattleState.PLAYER_MOVE);
+                target = opponent;
+                moveUsed(player);
+            
                 return;
             }
 
@@ -555,8 +537,17 @@ public class Battle extends JFrame implements KeyListener {
 
             else if (battleState == BattleState.BAG_POKEBALLS) {
                 if (optionChoice == 0 && pokeballs.items().get(0).quantity > 0) {
+                    pokeballShakes = 0;
                     window.confirmSound();
-                    pokeballUsed();
+
+                    Timer timer = new Timer(225, er1 -> {
+                        window.pokeballThrowSound();
+                    });
+                    
+                    timer.setRepeats(false);
+                    timer.start();
+
+                    pokeballUsed(BattleState.POKEBALL_USED);
                 }
             }
 
@@ -632,30 +623,8 @@ public class Battle extends JFrame implements KeyListener {
                     }
 
                     else {
-                        lastMove = opponent.moves.get(ThreadLocalRandom.current().nextInt(0, 4));
-
-                        multiplier = effectiveCheck(lastMove, player);
-                        int damage = damageCalculation(lastMove, player);
-
-                        player.hp -= damage;
-
-                        if (player.hp <  0) {
-                            player.hp = 0;
-                        }
-
-                        if (multiplier < 1 && multiplier != 0) {
-                            window.notVeryEffectiveSound();
-                        }
-
-                        else if (multiplier > 1) {
-                            window.superEffectiveSound();
-                        }
-
-                        else if (multiplier == 1) {
-                            window.attackSound();
-                        }
-
-                        enterBattleState(BattleState.OPPONENT_MOVE);
+                        target = player;
+                        moveUsed(opponent);
                     }
                 }
             }
@@ -699,31 +668,8 @@ public class Battle extends JFrame implements KeyListener {
                 }
 
                 else if (playerTurn == true) {
-                    lastMove = opponent.moves.get(ThreadLocalRandom.current().nextInt(0, 4));
-
-                    double multiplier = effectiveCheck(lastMove, player);
-
-                    int damage = damageCalculation(lastMove, player);
-
-                    player.hp -= damage;
-
-                    if (player.hp <  0) {
-                        player.hp = 0;
-                    }
-
-                    if (multiplier < 1 && multiplier != 0) {
-                        window.notVeryEffectiveSound();
-                    }
-
-                    else if (multiplier > 1) {
-                        window.superEffectiveSound();
-                    }
-
-                    else if (multiplier == 1) {
-                        window.attackSound();
-                    }
-
-                    enterBattleState(BattleState.OPPONENT_MOVE);
+                    target = player;
+                    moveUsed(opponent);
                 }
 
                 else {
@@ -738,30 +684,8 @@ public class Battle extends JFrame implements KeyListener {
             }
 
             else if (battleState == BattleState.OPPONENT_IMMUNE) {
-                lastMove = opponent.moves.get(ThreadLocalRandom.current().nextInt(0, 4));
-
-                double multiplier = effectiveCheck(lastMove, player);
-                int damage = damageCalculation(lastMove, player);
-
-                player.hp -= damage;
-
-                if (player.hp <  0) {
-                    player.hp = 0;
-                }
-
-                if (multiplier < 1 && multiplier != 0) {
-                    window.notVeryEffectiveSound();
-                }
-
-                else if (multiplier > 1) {
-                    window.superEffectiveSound();
-                }
-
-                else if (multiplier == 1) {
-                    window.attackSound();
-                }
-                
-                enterBattleState(BattleState.OPPONENT_MOVE);
+                target = player;
+                moveUsed(opponent);
             }
 
             else if (battleState == BattleState.PLAYER_FAINT) {
@@ -820,31 +744,8 @@ public class Battle extends JFrame implements KeyListener {
             window.repaint();
 
             Timer toOpponentMove = new Timer (2500, er -> {
-                lastMove = opponent.moves.get(ThreadLocalRandom.current().nextInt(0, 4));
-
-                double multiplier = effectiveCheck(lastMove, player);
-
-                int damage = damageCalculation(lastMove, player);
-
-                player.hp -= damage;
-
-                if (player.hp <  0) {
-                    player.hp = 0;
-                }
-
-                if (multiplier < 1 && multiplier != 0) {
-                    window.notVeryEffectiveSound();
-                }
-
-                else if (multiplier > 1) {
-                    window.superEffectiveSound();
-                }
-
-                else if (multiplier == 1) {
-                    window.attackSound();
-                }
-
-                enterBattleState(BattleState.OPPONENT_MOVE);
+                target = player;
+                moveUsed(opponent);
             });
 
             toOpponentMove.setRepeats(false);
@@ -855,119 +756,117 @@ public class Battle extends JFrame implements KeyListener {
         potionDialogueTimer.start();
     }
 
-    public void pokeballUsed() {
-        battleState = BattleState.POKEBALL_USED;
-        pokeballs.items().get(0).quantity -= 1;
 
+    public void pokeballUsed(BattleState state) {
+        if (battleTimer != null && battleTimer.isRunning()) {
+            battleTimer.stop();
+        }
+
+        battleState = state;
         window.repaint();
 
-        Timer firstShake = new Timer(1000, e -> {
-            battleState = BattleState.POKEBALL_SHAKE;
-            window.pokeballShakeSound();
-            window.repaint();
+        if (battleState == BattleState.POKEBALL_USED) {
+            
+            if (pokeballShakes <= 2) {
+                battleTimer = new Timer(1000, e -> {
 
-            Timer neutral = new Timer(500, er -> {
-                battleState = BattleState.POKEBALL_USED;
-                window.repaint();
+                    if (Math.random() >= 0.25) {
+                        pokeballShakes++;
 
-                Timer secondShake = new Timer(1000, er1 -> {
-                    battleState = BattleState.POKEBALL_SHAKE;
-                    window.pokeballShakeSound();
-                    window.repaint();
+                        if (pokeballShakes <= 2) {
+                            window.pokeballShakeSound();
+                            pokeballUsed(BattleState.POKEBALL_SHAKE);
+                        }
 
-                    double random = Math.random();
-
-                    if (random >= 0.60) {
-                        pokemonCaught = true;
-                    }
-
-
-                    if (pokemonCaught == true) {
-                        Timer toCaught = new Timer(1000, er2 -> {
-                            battleState = BattleState.POKEBALL_CAUGHT;
+                        else {
                             window.pokemonCaught();
                             window.stopBattleMusic();
-
-                            window.repaint();
-
-                            Timer caughtDialogueTimer = new Timer(4000, er3 -> {
-                                battleState = BattleState.PLAYER_WIN;
-                                window.repaint();
-
-                                Timer backToMenu = new Timer(5000, er4 -> {
-                                    window.removeKeyListener(this);
-                                    window.showMainMenu();
-                                });
-
-                                backToMenu.setRepeats(false);
-                                backToMenu.start();
-                            });
-
-                            caughtDialogueTimer.setRepeats(false);
-                            caughtDialogueTimer.start();
-                        });
-
-                        toCaught.setRepeats(false);
-                        toCaught.start();
+                            pokeballUsed(BattleState.POKEBALL_CAUGHT);
+                        }
                     }
 
                     else {
-                        Timer pokeballBroke = new Timer(1000, er2 -> {
-                            battleState = BattleState.POKEBALL_BROKE;
-                            window.repaint();
-
-                            Timer toOpponentMove = new Timer(2500, er3 -> {
-
-                                lastMove = opponent.moves.get(ThreadLocalRandom.current().nextInt(0, 4));
-
-                                double multiplier = effectiveCheck(lastMove, player);
-                                int damage = damageCalculation(lastMove, player);
-
-                                player.hp -= damage;
-
-                                if (player.hp <  0) {
-                                    player.hp = 0;
-                                }
-
-                                if (multiplier < 1 && multiplier != 0) {
-                                    window.notVeryEffectiveSound();
-                                }
-
-                                else if (multiplier > 1) {
-                                    window.superEffectiveSound();
-                                }
-
-                                else if (multiplier == 1) {
-                                    window.attackSound();
-                                }
-
-                                enterBattleState(BattleState.OPPONENT_MOVE);
-
-                            });
-
-                            toOpponentMove.setRepeats(false);
-                            toOpponentMove.start();
-                        
-                        });
-
-                        pokeballBroke.setRepeats(false);
-                        pokeballBroke.start();
+                        pokeballUsed(BattleState.POKEBALL_BROKE);
                     }
-
                 });
 
-                secondShake.setRepeats(false);
-                secondShake.start();
+                battleTimer.setRepeats(false);
+                battleTimer.start();
+            }
+        }
+
+        else if (battleState == BattleState.POKEBALL_SHAKE) {
+            battleTimer = new Timer (500, e -> {
+                pokeballUsed(BattleState.POKEBALL_USED);
             });
 
-            neutral.setRepeats(false);
-            neutral.start();
+            battleTimer.setRepeats(false);
+            battleTimer.start();
+        }
 
-        });
+        else if (battleState == BattleState.POKEBALL_BROKE) {
+            battleTimer = new Timer(2500, e -> {
+                target = player;
+                moveUsed(opponent);
+            });
 
-        firstShake.setRepeats(false);
-        firstShake.start();
+            battleTimer.setRepeats(false);
+            battleTimer.start();
+        }
 
+        else if (battleState == BattleState.POKEBALL_CAUGHT) {
+            battleTimer = new Timer(4000, e -> {
+                enterBattleState(BattleState.PLAYER_WIN);
+            });
+
+            battleTimer.setRepeats(false);
+            battleTimer.start();
+        }
     }
+
+    public void moveUsed(Pokemon user) {
+
+        if (user == player) {
+            lastMove = player.moves.get(optionChoice);
+        }
+
+        else {
+            lastMove = opponent.moves.get(ThreadLocalRandom.current().nextInt(0, 4));
+        }
+
+        double multiplier = effectiveCheck(lastMove, target);
+
+        int damage = damageCalculation(lastMove, target);
+
+        target.hp -= damage;
+
+        if (target.hp <  0) {
+            target.hp = 0;
+        }
+
+        if (multiplier < 1 && multiplier != 0) {
+            window.notVeryEffectiveSound();
+        }
+
+        else if (multiplier > 1) {
+            window.superEffectiveSound();
+        }
+
+        else if (multiplier == 1) {
+            window.attackSound();
+        }
+
+        if (user == player) {
+            enterBattleState(BattleState.PLAYER_MOVE);
+            return;
+        }
+
+        else {
+            enterBattleState(BattleState.OPPONENT_MOVE);
+            return;
+        }
+        
+    }
+
 }
 
