@@ -1,5 +1,6 @@
 package TerminalRPG_v3.src;
 
+import java.awt.Dimension;
 import java.io.File;
 
 import javax.sound.sampled.AudioInputStream;
@@ -19,6 +20,7 @@ public class Window extends JFrame {
 
       setTitle("Valorant");
       setDefaultCloseOperation(EXIT_ON_CLOSE);
+      setMinimumSize(new Dimension(1280, 720));
       setSize(1280, 720);
       setLocationRelativeTo(null);
 

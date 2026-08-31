@@ -9,6 +9,9 @@ public class About extends JFrame implements KeyListener {
     private Image background;
     private Image cursor;
 
+    private int windowWidth;
+    private int windowHeight;
+
     public About(Window window) {
         background = new ImageIcon("assets/img/about.jpg").getImage();
         
@@ -18,13 +21,12 @@ public class About extends JFrame implements KeyListener {
            @Override
            protected void paintComponent(Graphics g) {
             super.paintComponent(g);
+
+            windowWidth = getWidth();
+            windowHeight = getHeight();
+
             // About page background
             g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
-
-            // Cursor for going back to the main menu
-            cursor = new ImageIcon("assets/img/arrow.png").getImage();
-
-            g.drawImage(cursor, 675, 482, 50, 50, this);
 
            } 
         });
@@ -41,7 +43,7 @@ public class About extends JFrame implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         // Listening for enter key strokes
-        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+        if (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
             window.backSound();
             window.removeKeyListener(this);
             window.showMainMenu();
@@ -55,4 +57,12 @@ public class About extends JFrame implements KeyListener {
   @Override
       public void keyTyped(KeyEvent e) {
       }
+
+    public int getRelativeWidth(int x) {
+        return (int) (((double) x / 1280.0) * (double) (windowWidth + 16));
+    }
+
+    public int getRelativeHeight(int y) {
+        return (int) (((double) y / 720.0) * (windowHeight + 39));
+    }
 }

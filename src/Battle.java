@@ -15,6 +15,10 @@ import static TerminalRPG_v3.src.Database.effectiveCheck;
 public class Battle extends JFrame implements KeyListener {
     // Initializing paint elements
     private Window window;
+
+    private int windowWidth;
+    private int windowHeight;
+
     private Image background;
     private Image bagImage;
 
@@ -147,6 +151,9 @@ public class Battle extends JFrame implements KeyListener {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 
+                windowWidth = getWidth();
+                windowHeight = getHeight();
+
                 // Drawing background every paint
                 g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
 
@@ -155,24 +162,25 @@ public class Battle extends JFrame implements KeyListener {
 
                 g.setFont(smallerPokemon);
                 
-                g.drawString(player.name(), 750, 360);
-                g.drawString(String.valueOf(player.level()), 1100, 362);
+                g.drawString(player.name(), getRelativeWidth(750), getRelativeHeight(360));
 
-                g.drawString(opponent.name(), 120, 123);
-                g.drawString(String.valueOf(opponent.level()), 480, 127);
+                g.drawString(String.valueOf(player.level()), getRelativeWidth(1100) + getRelativeWidth(15), getRelativeHeight(362));
 
-                g.drawString(String.valueOf(playerMaxHp), 1100, 430);
-                g.drawString(String.valueOf(player.hp), 1000, 430);
+                g.drawString(opponent.name(), getRelativeWidth(120), getRelativeHeight(123));
+                g.drawString(String.valueOf(opponent.level()), getRelativeWidth(480) + getRelativeWidth(15), getRelativeHeight(127));
+
+                g.drawString(String.valueOf(playerMaxHp), getRelativeWidth(1100), getRelativeHeight(430));
+                g.drawString(String.valueOf(player.hp), getRelativeWidth(1000), getRelativeHeight(430));
 
 
                 // Drawing pokemon sprites IF they are still alive
                 if (battleState != BattleState.PLAYER_FAINT && battleState != BattleState.OPPONENT_WIN) {
-                    g.drawImage(playerSprite, 260, 250, 230, 230, this);
+                    g.drawImage(playerSprite, getRelativeWidth(260), getRelativeHeight(250), getRelativeWidth(230), getRelativeHeight(230), this);
                 }
 
                 if (battleState != BattleState.OPPONENT_FAINT && battleState != BattleState.PLAYER_WIN && 
                     battleState != BattleState.POKEBALL_USED && battleState != BattleState.POKEBALL_CAUGHT && battleState != BattleState.POKEBALL_SHAKE) {
-                    g.drawImage(opponentSprite, 800, 70, 235, 235, this);
+                    g.drawImage(opponentSprite, getRelativeWidth(800), getRelativeHeight(70), getRelativeWidth(235), getRelativeHeight(235), this);
                 }
 
 
@@ -187,11 +195,11 @@ public class Battle extends JFrame implements KeyListener {
                 // Green and black elements of player HP bar
                 int width = (int)(((double)player.hp / playerMaxHp) * 250);
 
-                g.fillRect(910, 376, width, 25);
+                g.fillRect(getRelativeWidth(910), getRelativeHeight(376), getRelativeWidth(width), getRelativeHeight(28));
 
                 g.setColor(Color.black);
 
-                g.fillRect(910 + width, 376, 250 - width, 25);
+                g.fillRect(getRelativeWidth(910 + width), getRelativeHeight(378), getRelativeWidth(250 - width), getRelativeHeight(28));
 
 
                 // Opponent HP bar
@@ -202,11 +210,11 @@ public class Battle extends JFrame implements KeyListener {
                 }
 
                 width = (int)(((double)opponent.hp / opponentMaxHp) * 250);
-                g.fillRect(285, 141, width, 25);
+                g.fillRect(getRelativeWidth(285), getRelativeHeight(141), getRelativeWidth(width), getRelativeHeight(25));
 
                 g.setColor(Color.black);
 
-                g.fillRect(285 + width, 141, 250 - width, 25);
+                g.fillRect(getRelativeWidth(285 + width), getRelativeHeight(141), getRelativeWidth(250 - width), getRelativeHeight(25));
 
                 g.setFont(biggerPokemon);
                 g.setColor(Color.WHITE);
@@ -216,17 +224,17 @@ public class Battle extends JFrame implements KeyListener {
 
                 switch (battleState) {
                     case BATTLE_INTRO -> {
-                        g.drawString("A wild  " + opponent.name() + " appeared! Go, " + player.name() + "!",100, 600);
+                        g.drawString("A wild  " + opponent.name() + " appeared! Go, " + player.name() + "!",getRelativeWidth(100), getRelativeHeight(600));
                     } 
 
 
                     case FIGHT_BAG_RUN -> {
-                        g.drawString("What will you do?", 100, 580);
-                        g.drawString("FIGHT", 650, 580);
-                        g.drawString("BAG", 870, 580);
-                        g.drawString("RUN", 1050, 580);
+                        g.drawString("What will you do?", getRelativeWidth(100), getRelativeHeight(580));
+                        g.drawString("FIGHT", getRelativeWidth(650), getRelativeHeight(580));
+                        g.drawString("BAG", getRelativeWidth(870), getRelativeHeight(580));
+                        g.drawString("RUN", getRelativeWidth(1050), getRelativeHeight(580));
 
-                        g.drawImage(cursor, fightBagRunOptionsX[optionChoice], 535, 40, 40, this);
+                        g.drawImage(cursor, getRelativeWidth(fightBagRunOptionsX[optionChoice]), getRelativeHeight(535) + getRelativeHeight(10), getRelativeWidth(40), getRelativeHeight(40), this);
                     }
 
                     case BAG_ITEMS -> {
@@ -238,30 +246,30 @@ public class Battle extends JFrame implements KeyListener {
                         g.setFont(biggerPokemon);
                         g.setColor(Color.BLACK);
 
-                        g.drawString("BAG", 295, 95);
+                        g.drawString("BAG", getRelativeWidth(295), getRelativeHeight(95));
 
                         g.setFont(smallerPokemon);
 
-                        g.drawString("Items", 875, 65);
-                        g.drawImage(bagArrow, 950, 29, 100, 50, this);
+                        g.drawString("Items", getRelativeWidth(875), getRelativeHeight(65));
+                        g.drawImage(bagArrow, getRelativeWidth(950), getRelativeHeight(29), getRelativeWidth(100), getRelativeHeight(50), this);
 
                         for (int i = 0; i < items.items().size(); i++) {
                             if (items.items().get(i).quantity > 0) {
                                 int yCoordinate = 90;
                                 Item item = items.items().get(i);
 
-                                g.drawImage(item.image(), 800, yCoordinate, 40, 40, this);
-                                g.drawString(item.quantity() + " - " + item.name(), 850, yCoordinate + 35);
+                                g.drawImage(item.image(), getRelativeWidth(800), getRelativeHeight(yCoordinate), getRelativeWidth(40), getRelativeHeight(40), this);
+                                g.drawString(item.quantity() + " - " + item.name(), getRelativeWidth(850), getRelativeHeight(yCoordinate + 35));
 
-                                g.drawImage(cursor, 750, yCoordinate, 40, 40, this);
+                                g.drawImage(cursor, getRelativeWidth(750), getRelativeHeight(yCoordinate), getRelativeWidth(40), getRelativeHeight(40), this);
 
                                 yCoordinate += 50;
 
-                                g.drawImage(item.image(), 52, 320, 100, 100, this);
+                                g.drawImage(item.image(), getRelativeWidth(52), getRelativeHeight(320), getRelativeWidth(100), getRelativeHeight(100), this);
 
-                                g.drawString("A spray-type wound medicine.", 36, 500);
-                                g.drawString("It restores the HP of one Pokemon", 36, 550);
-                                g.drawString("by 50 points.", 36, 600);
+                                g.drawString("A spray-type wound medicine.", getRelativeWidth(36), getRelativeHeight(500));
+                                g.drawString("It restores the HP of one Pokemon", getRelativeWidth(36), getRelativeHeight(550));
+                                g.drawString("by 50 points.", getRelativeWidth(36), getRelativeHeight(600));
                             }
                         }
                     }
@@ -275,60 +283,60 @@ public class Battle extends JFrame implements KeyListener {
                         g.setFont(biggerPokemon);
                         g.setColor(Color.BLACK);
 
-                        g.drawString("BAG", 295, 95);
+                        g.drawString("BAG", getRelativeWidth(295), getRelativeHeight(95));
 
                         g.setFont(smallerPokemon);
 
-                        g.drawString("Pokeballs", 875, 65);
-                        g.drawImage(bagArrow, 800, 29, 100, 50, this);
+                        g.drawString("Pokeballs", getRelativeWidth(875), getRelativeHeight(65));
+                        g.drawImage(bagArrow, getRelativeWidth(800), getRelativeHeight(29), getRelativeWidth(100), getRelativeHeight(50), this);
 
                         for (int i = 0; i < pokeballs.items().size(); i++) {
                             if (pokeballs.items().get(i).quantity > 0) {
                                 int yCoordinate = 90;
                                 Item item = pokeballs.items().get(i);
 
-                                g.drawImage(item.image(), 840, yCoordinate, -40, 40, this);
-                                g.drawString(item.quantity() + " - " + item.name(), 850, yCoordinate + 35);
+                                g.drawImage(item.image(), getRelativeWidth(800), getRelativeHeight(yCoordinate), getRelativeWidth(40), getRelativeHeight(40), this);
+                                g.drawString(item.quantity() + " - " + item.name(), getRelativeWidth(850), getRelativeHeight(yCoordinate + 35));
 
-                                g.drawImage(cursor, 750, yCoordinate, 40, 40, this);
+                                g.drawImage(cursor, getRelativeWidth(750), getRelativeHeight(yCoordinate), getRelativeWidth(40), getRelativeHeight(40), this);
 
                                 yCoordinate += 50;
 
-                                g.drawImage(item.image(), 52, 320, 100, 100, this);
+                                g.drawImage(item.image(), getRelativeWidth(52), getRelativeHeight(320), getRelativeWidth(100), getRelativeHeight(100), this);
 
-                                g.drawString("A ball thrown to catch a wild Pokemon.", 36, 500);
-                                g.drawString("It is designed in a capsule style.", 36, 550);
+                                g.drawString("A ball thrown to catch a wild Pokemon.", getRelativeWidth(36), getRelativeHeight(500));
+                                g.drawString("It is designed in a capsule style.", getRelativeWidth(36), getRelativeHeight(550));
                             }
                         }
                     }
 
                     case POTION_USED -> {
-                        g.drawString("You used a Super Potion.", 100, 600);
+                        g.drawString("You used a Super Potion.", getRelativeWidth(100), getRelativeHeight(600));
                     }
 
                     case POKEBALL_USED -> {
-                        g.drawString("You used a Pokeball.", 100, 600);
-                        g.drawImage(pokeballs.items().get(0).image(), 870, 205, 70, 70, this);
+                        g.drawString("You used a Pokeball.", getRelativeWidth(100), getRelativeHeight(600));
+                        g.drawImage(pokeballs.items().get(0).image(), getRelativeWidth(870), getRelativeHeight(205), getRelativeWidth(70), getRelativeHeight(70), this);
                     }
 
                     case POKEBALL_SHAKE -> {
                         Image tiltedPokeball = new ImageIcon("assets/img/pokeballtilt.png").getImage();
 
-                        g.drawString("You used a Pokeball.", 100, 600);
-                        g.drawImage(tiltedPokeball, 870, 205, 55, 55, this);
+                        g.drawString("You used a Pokeball.", getRelativeHeight(100), getRelativeHeight(600));
+                        g.drawImage(tiltedPokeball, getRelativeWidth(870), getRelativeHeight(205), getRelativeWidth(55), getRelativeHeight(55), this);
                     }
 
                     case POKEBALL_CAUGHT -> {
-                        g.drawString("Gotcha! " + opponent.name() + " was caught!", 100, 600);
-                        g.drawImage(pokeballs.items().get(0).image(), 870, 205, 70, 70, this);
+                        g.drawString("Gotcha! " + opponent.name() + " was caught!", getRelativeWidth(100), getRelativeHeight(600));
+                        g.drawImage(pokeballs.items().get(0).image(), getRelativeWidth(870), getRelativeHeight(205), getRelativeWidth(70), getRelativeHeight(70), this);
                     }
 
                     case POKEBALL_BROKE -> {
-                        g.drawString("Oh no! The Pokemon broke free!", 100, 600);
+                        g.drawString("Oh no! The Pokemon broke free!", getRelativeWidth(100), getRelativeHeight(600));
                     }
 
                     case PLAYER_RUN -> {
-                        g.drawString("You ran away!", 100, 580);
+                        g.drawString("You ran away!", getRelativeWidth(100), getRelativeHeight(580));
                     }
 
                     case CHOOSE_MOVE -> {
@@ -337,58 +345,58 @@ public class Battle extends JFrame implements KeyListener {
                         g.setFont(pokemonMoves);
 
                         for (int i = 0; i < 4; i++) {
-                            g.drawString(player.moves().get(i).move(), xCoordinate, 580);
+                            g.drawString(player.moves().get(i).move(), getRelativeWidth(xCoordinate), getRelativeHeight(580));
                             xCoordinate += 270;
                         }
 
-                        g.drawImage(cursor, moveOptionsX[optionChoice], 550, 40, 40, this);
+                        g.drawImage(cursor, getRelativeWidth(moveOptionsX[optionChoice]), getRelativeHeight(550), getRelativeWidth(40), getRelativeHeight(40), this);
 
                     }
 
                     case PLAYER_MOVE -> {
-                        g.drawString(player.name() + " used " + lastMove.move() + "!", 100, 600);
+                        g.drawString(player.name() + " used " + lastMove.move() + "!", getRelativeWidth(100), getRelativeHeight(600));
                     }
 
                     case NOT_VERY_EFFECTIVE -> {
-                        g.drawString("It's not very effective...", 100, 600);
+                        g.drawString("It's not very effective...", getRelativeWidth(100), getRelativeHeight(600));
                     }
 
                     case SUPER_EFFECTIVE -> {
-                        g.drawString("It's super effective!", 100, 600);
+                        g.drawString("It's super effective!", getRelativeWidth(100), getRelativeHeight(600));
                     }
 
                     case PLAYER_IMMUNE -> {
-                        g.drawString("It doesn't affect " + player.name() + "...", 100, 600);
+                        g.drawString("It doesn't affect " + player.name() + "...", getRelativeWidth(100), getRelativeHeight(600));
                     }
 
                     case OPPONENT_IMMUNE -> {
-                        g.drawString("It doesn't affect " + opponent.name() + "...", 100, 600);
+                        g.drawString("It doesn't affect " + opponent.name() + "...", getRelativeWidth(100), getRelativeHeight(600));
                     }
 
                     case OPPONENT_MOVE -> {
-                        g.drawString(opponent.name() + " used " + lastMove.move() + "!", 100, 600);
+                        g.drawString(opponent.name() + " used " + lastMove.move() + "!", getRelativeWidth(100), getRelativeHeight(600));
                     }
 
                     case PLAYER_FAINT -> {
                         window.faintSound();
-                        g.drawString(player.name() + " has fainted...", 100, 600);
+                        g.drawString(player.name() + " has fainted...", getRelativeWidth(100), getRelativeHeight(600));
                     }
 
                     case OPPONENT_FAINT -> {
                         window.faintSound();
-                        g.drawString(opponent.name() + " has fainted...", 100, 600);
+                        g.drawString(opponent.name() + " has fainted...", getRelativeWidth(100), getRelativeHeight(600));
                     }
 
                     case PLAYER_WIN -> {
                         window.playWinMusic();
                         if (pokemonCaught == true) {
-                            g.drawImage(pokeballs.items().get(0).image(), 870, 205, 70, 70, this);
+                            g.drawImage(pokeballs.items().get(0).image(), getRelativeWidth(870), getRelativeHeight(205), getRelativeWidth(70), getRelativeHeight(70), this);
                         }
-                        g.drawString("You won the fight! Returning in 5 seconds...", 80, 600);
+                        g.drawString("You won the fight! Returning in 5 seconds...", getRelativeWidth(80), getRelativeHeight(600));
                     }
 
                     case OPPONENT_WIN -> {
-                        g.drawString("You lost the fight. Returning in 5 seconds...", 75, 600);
+                        g.drawString("You lost the fight. Returning in 5 seconds...", getRelativeWidth(75), getRelativeHeight(600));
                     }
                 }
             }
@@ -541,6 +549,8 @@ public class Battle extends JFrame implements KeyListener {
 
             else if (battleState == BattleState.BAG_POKEBALLS) {
                 if (optionChoice == 0 && pokeballs.items().get(0).quantity > 0) {
+                    pokeballs.items().get(0).quantity--;
+                    
                     pokeballShakes = 0;
                     window.confirmSound();
 
@@ -872,5 +882,12 @@ public class Battle extends JFrame implements KeyListener {
         
     }
 
+    public int getRelativeWidth(int x) {
+        return (int) (((double) x / 1280.0) * (double) (windowWidth + 16));
+    }
+
+    public int getRelativeHeight(int y) {
+        return (int) (((double) y / 720.0) * (windowHeight + 39));
+    }
 }
 

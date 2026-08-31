@@ -10,6 +10,9 @@ public class mainMenu extends JFrame implements KeyListener {
     private Image background;
     private Image cursor;
 
+    private int windowWidth;
+    private int windowHeight;
+
     private int selectedOption = 0;
 
     private int[] optionsX = {515, 485, 515};
@@ -26,11 +29,14 @@ public class mainMenu extends JFrame implements KeyListener {
         @Override
         protected void paintComponent (Graphics g) {
             super.paintComponent(g);
+
+            windowHeight = getHeight();
+            windowWidth = getWidth();
             g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
 
             // Setting up option/choice arrow
             cursor = new ImageIcon("assets/img/arrow.png").getImage();
-            g.drawImage(cursor, optionsX[selectedOption], optionsY[selectedOption], 50, 50, this);
+            g.drawImage(cursor, getRelativeWidth(optionsX[selectedOption]), getRelativeHeight(optionsY[selectedOption]), getRelativeWidth(50), getRelativeHeight(50), this);
         }
       });
 
@@ -111,4 +117,12 @@ public class mainMenu extends JFrame implements KeyListener {
   @Override
       public void keyTyped(KeyEvent e) {
       }
+
+    public int getRelativeWidth(int x) {
+        return (int) (((double) x / 1280.0) * (double) (windowWidth + 16));
+    }
+
+    public int getRelativeHeight(int y) {
+        return (int) (((double) y / 720.0) * (windowHeight + 39));
+    }
 }
