@@ -2,7 +2,6 @@ package TerminalRPG_v3.src;
 
 import java.awt.Image;
 import java.util.ArrayList;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -117,7 +116,7 @@ public class Database {
         }
         
         try {
-            sprite = new ImageIcon(new URL(spriteURL)).getImage();
+            sprite = new ImageIcon(java.net.URI.create(spriteURL).toURL()).getImage();
         } catch (Exception e) {
             e.printStackTrace();
         }

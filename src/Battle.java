@@ -211,182 +211,186 @@ public class Battle extends JFrame implements KeyListener {
                 g.setFont(biggerPokemon);
                 g.setColor(Color.WHITE);
 
-                if (battleState == BattleState.BATTLE_INTRO) {
-                    g.drawString("A wild  " + opponent.name() + " appeared! Go, " + player.name() + "!",100, 600);
-                } 
+                
+                // State-based dialogue machine
+
+                switch (battleState) {
+                    case BATTLE_INTRO -> {
+                        g.drawString("A wild  " + opponent.name() + " appeared! Go, " + player.name() + "!",100, 600);
+                    } 
 
 
-                else if (battleState == BattleState.FIGHT_BAG_RUN) {
-                    g.drawString("What will you do?", 100, 580);
-                    g.drawString("FIGHT", 650, 580);
-                    g.drawString("BAG", 870, 580);
-                    g.drawString("RUN", 1050, 580);
+                    case FIGHT_BAG_RUN -> {
+                        g.drawString("What will you do?", 100, 580);
+                        g.drawString("FIGHT", 650, 580);
+                        g.drawString("BAG", 870, 580);
+                        g.drawString("RUN", 1050, 580);
 
-                    g.drawImage(cursor, fightBagRunOptionsX[optionChoice], 535, 40, 40, this);
-                }
+                        g.drawImage(cursor, fightBagRunOptionsX[optionChoice], 535, 40, 40, this);
+                    }
 
-                else if (battleState == BattleState.BAG_ITEMS) {
-                    bagImage = new ImageIcon("assets/img/bag.png").getImage();
-                    bagArrow = new ImageIcon("assets/img/right_red_arrow.png").getImage();
+                    case BAG_ITEMS -> {
+                        bagImage = new ImageIcon("assets/img/bag.png").getImage();
+                        bagArrow = new ImageIcon("assets/img/right_red_arrow.png").getImage();
 
-                    g.drawImage(bagImage, 0, 0, getWidth(), getHeight(), this);
+                        g.drawImage(bagImage, 0, 0, getWidth(), getHeight(), this);
 
-                    g.setFont(biggerPokemon);
-                    g.setColor(Color.BLACK);
+                        g.setFont(biggerPokemon);
+                        g.setColor(Color.BLACK);
 
-                    g.drawString("BAG", 295, 95);
+                        g.drawString("BAG", 295, 95);
 
-                    g.setFont(smallerPokemon);
+                        g.setFont(smallerPokemon);
 
-                    g.drawString("Items", 875, 65);
-                    g.drawImage(bagArrow, 950, 29, 100, 50, this);
+                        g.drawString("Items", 875, 65);
+                        g.drawImage(bagArrow, 950, 29, 100, 50, this);
 
-                    for (int i = 0; i < items.items().size(); i++) {
-                        if (items.items().get(i).quantity > 0) {
-                            int yCoordinate = 90;
-                            Item item = items.items().get(i);
+                        for (int i = 0; i < items.items().size(); i++) {
+                            if (items.items().get(i).quantity > 0) {
+                                int yCoordinate = 90;
+                                Item item = items.items().get(i);
 
-                            g.drawImage(item.image(), 800, yCoordinate, 40, 40, this);
-                            g.drawString(item.quantity() + " - " + item.name(), 850, yCoordinate + 35);
+                                g.drawImage(item.image(), 800, yCoordinate, 40, 40, this);
+                                g.drawString(item.quantity() + " - " + item.name(), 850, yCoordinate + 35);
 
-                            g.drawImage(cursor, 750, yCoordinate, 40, 40, this);
+                                g.drawImage(cursor, 750, yCoordinate, 40, 40, this);
 
-                            yCoordinate += 50;
+                                yCoordinate += 50;
 
-                            g.drawImage(item.image(), 52, 320, 100, 100, this);
+                                g.drawImage(item.image(), 52, 320, 100, 100, this);
 
-                            g.drawString("A spray-type wound medicine.", 36, 500);
-                            g.drawString("It restores the HP of one Pokemon", 36, 550);
-                            g.drawString("by 50 points.", 36, 600);
+                                g.drawString("A spray-type wound medicine.", 36, 500);
+                                g.drawString("It restores the HP of one Pokemon", 36, 550);
+                                g.drawString("by 50 points.", 36, 600);
+                            }
                         }
                     }
-                }
 
-                else if (battleState == BattleState.BAG_POKEBALLS) {
-                    bagImage = new ImageIcon("assets/img/bag.png").getImage();
-                    bagArrow = new ImageIcon("assets/img/left_red_arrow.png").getImage();
+                    case BAG_POKEBALLS -> {
+                        bagImage = new ImageIcon("assets/img/bag.png").getImage();
+                        bagArrow = new ImageIcon("assets/img/left_red_arrow.png").getImage();
 
-                    g.drawImage(bagImage, 0, 0, getWidth(), getHeight(), this);
+                        g.drawImage(bagImage, 0, 0, getWidth(), getHeight(), this);
 
-                    g.setFont(biggerPokemon);
-                    g.setColor(Color.BLACK);
+                        g.setFont(biggerPokemon);
+                        g.setColor(Color.BLACK);
 
-                    g.drawString("BAG", 295, 95);
+                        g.drawString("BAG", 295, 95);
 
-                    g.setFont(smallerPokemon);
+                        g.setFont(smallerPokemon);
 
-                    g.drawString("Pokeballs", 875, 65);
-                    g.drawImage(bagArrow, 800, 29, 100, 50, this);
+                        g.drawString("Pokeballs", 875, 65);
+                        g.drawImage(bagArrow, 800, 29, 100, 50, this);
 
-                    for (int i = 0; i < pokeballs.items().size(); i++) {
-                        if (pokeballs.items().get(i).quantity > 0) {
-                            int yCoordinate = 90;
-                            Item item = pokeballs.items().get(i);
+                        for (int i = 0; i < pokeballs.items().size(); i++) {
+                            if (pokeballs.items().get(i).quantity > 0) {
+                                int yCoordinate = 90;
+                                Item item = pokeballs.items().get(i);
 
-                            g.drawImage(item.image(), 840, yCoordinate, -40, 40, this);
-                            g.drawString(item.quantity() + " - " + item.name(), 850, yCoordinate + 35);
+                                g.drawImage(item.image(), 840, yCoordinate, -40, 40, this);
+                                g.drawString(item.quantity() + " - " + item.name(), 850, yCoordinate + 35);
 
-                            g.drawImage(cursor, 750, yCoordinate, 40, 40, this);
+                                g.drawImage(cursor, 750, yCoordinate, 40, 40, this);
 
-                            yCoordinate += 50;
+                                yCoordinate += 50;
 
-                            g.drawImage(item.image(), 52, 320, 100, 100, this);
+                                g.drawImage(item.image(), 52, 320, 100, 100, this);
 
-                            g.drawString("A ball thrown to catch a wild Pokemon.", 36, 500);
-                            g.drawString("It is designed in a capsule style.", 36, 550);
+                                g.drawString("A ball thrown to catch a wild Pokemon.", 36, 500);
+                                g.drawString("It is designed in a capsule style.", 36, 550);
+                            }
                         }
                     }
-                }
 
-                else if (battleState == BattleState.POTION_USED) {
-                    g.drawString("You used a Super Potion.", 100, 600);
-                }
-
-                else if (battleState == BattleState.POKEBALL_USED) {
-                    g.drawString("You used a Pokeball.", 100, 600);
-                    g.drawImage(pokeballs.items().get(0).image(), 870, 205, 70, 70, this);
-                }
-
-                else if (battleState == BattleState.POKEBALL_SHAKE) {
-                    Image tiltedPokeball = new ImageIcon("assets/img/pokeballtilt.png").getImage();
-
-                    g.drawString("You used a Pokeball.", 100, 600);
-                    g.drawImage(tiltedPokeball, 870, 205, 55, 55, this);
-                }
-
-                else if (battleState == BattleState.POKEBALL_CAUGHT) {
-                    g.drawString("Gotcha! " + opponent.name() + " was caught!", 100, 600);
-                    g.drawImage(pokeballs.items().get(0).image(), 870, 205, 70, 70, this);
-                }
-
-                else if (battleState == BattleState.POKEBALL_BROKE) {
-                    g.drawString("Oh no! The Pokemon broke free!", 100, 600);
-                }
-
-                else if (battleState == BattleState.PLAYER_RUN) {
-                    g.drawString("You ran away!", 100, 580);
-                }
-
-                else if (battleState == BattleState.CHOOSE_MOVE) {
-                    int xCoordinate = 150;
-
-                    g.setFont(pokemonMoves);
-
-                    for (int i = 0; i < 4; i++) {
-                        g.drawString(player.moves().get(i).move(), xCoordinate, 580);
-                        xCoordinate += 270;
+                    case POTION_USED -> {
+                        g.drawString("You used a Super Potion.", 100, 600);
                     }
 
-                    g.drawImage(cursor, moveOptionsX[optionChoice], 550, 40, 40, this);
-
-                }
-
-                else if (battleState == BattleState.PLAYER_MOVE) {
-                    g.drawString(player.name() + " used " + lastMove.move() + "!", 100, 600);
-                }
-
-                else if (battleState == BattleState.NOT_VERY_EFFECTIVE) {
-                    g.drawString("It's not very effective...", 100, 600);
-                }
-
-                else if (battleState == BattleState.SUPER_EFFECTIVE) {
-                    g.drawString("It's super effective!", 100, 600);
-                }
-
-                else if (battleState == BattleState.PLAYER_IMMUNE) {
-                    g.drawString("It doesn't affect " + player.name() + "...", 100, 600);
-                }
-
-                else if (battleState == BattleState.OPPONENT_IMMUNE) {
-                    g.drawString("It doesn't affect " + opponent.name() + "...", 100, 600);
-                }
-
-                else if (battleState == BattleState.OPPONENT_MOVE) {
-                    g.drawString(opponent.name() + " used " + lastMove.move() + "!", 100, 600);
-                }
-
-                else if (battleState == BattleState.PLAYER_FAINT) {
-                    window.faintSound();
-                    g.drawString(player.name() + " has fainted...", 100, 600);
-                }
-
-                else if (battleState == BattleState.OPPONENT_FAINT) {
-                    window.faintSound();
-                    g.drawString(opponent.name() + " has fainted...", 100, 600);
-                }
-
-                else if (battleState == BattleState.PLAYER_WIN) {
-                    window.playWinMusic();
-                    if (pokemonCaught == true) {
+                    case POKEBALL_USED -> {
+                        g.drawString("You used a Pokeball.", 100, 600);
                         g.drawImage(pokeballs.items().get(0).image(), 870, 205, 70, 70, this);
                     }
-                    g.drawString("You won the fight! Returning in 5 seconds...", 80, 600);
-                }
 
-                else if (battleState == BattleState.OPPONENT_WIN) {
-                    g.drawString("You lost the fight. Returning in 5 seconds...", 75, 600);
-                }
+                    case POKEBALL_SHAKE -> {
+                        Image tiltedPokeball = new ImageIcon("assets/img/pokeballtilt.png").getImage();
 
+                        g.drawString("You used a Pokeball.", 100, 600);
+                        g.drawImage(tiltedPokeball, 870, 205, 55, 55, this);
+                    }
+
+                    case POKEBALL_CAUGHT -> {
+                        g.drawString("Gotcha! " + opponent.name() + " was caught!", 100, 600);
+                        g.drawImage(pokeballs.items().get(0).image(), 870, 205, 70, 70, this);
+                    }
+
+                    case POKEBALL_BROKE -> {
+                        g.drawString("Oh no! The Pokemon broke free!", 100, 600);
+                    }
+
+                    case PLAYER_RUN -> {
+                        g.drawString("You ran away!", 100, 580);
+                    }
+
+                    case CHOOSE_MOVE -> {
+                        int xCoordinate = 150;
+
+                        g.setFont(pokemonMoves);
+
+                        for (int i = 0; i < 4; i++) {
+                            g.drawString(player.moves().get(i).move(), xCoordinate, 580);
+                            xCoordinate += 270;
+                        }
+
+                        g.drawImage(cursor, moveOptionsX[optionChoice], 550, 40, 40, this);
+
+                    }
+
+                    case PLAYER_MOVE -> {
+                        g.drawString(player.name() + " used " + lastMove.move() + "!", 100, 600);
+                    }
+
+                    case NOT_VERY_EFFECTIVE -> {
+                        g.drawString("It's not very effective...", 100, 600);
+                    }
+
+                    case SUPER_EFFECTIVE -> {
+                        g.drawString("It's super effective!", 100, 600);
+                    }
+
+                    case PLAYER_IMMUNE -> {
+                        g.drawString("It doesn't affect " + player.name() + "...", 100, 600);
+                    }
+
+                    case OPPONENT_IMMUNE -> {
+                        g.drawString("It doesn't affect " + opponent.name() + "...", 100, 600);
+                    }
+
+                    case OPPONENT_MOVE -> {
+                        g.drawString(opponent.name() + " used " + lastMove.move() + "!", 100, 600);
+                    }
+
+                    case PLAYER_FAINT -> {
+                        window.faintSound();
+                        g.drawString(player.name() + " has fainted...", 100, 600);
+                    }
+
+                    case OPPONENT_FAINT -> {
+                        window.faintSound();
+                        g.drawString(opponent.name() + " has fainted...", 100, 600);
+                    }
+
+                    case PLAYER_WIN -> {
+                        window.playWinMusic();
+                        if (pokemonCaught == true) {
+                            g.drawImage(pokeballs.items().get(0).image(), 870, 205, 70, 70, this);
+                        }
+                        g.drawString("You won the fight! Returning in 5 seconds...", 80, 600);
+                    }
+
+                    case OPPONENT_WIN -> {
+                        g.drawString("You lost the fight. Returning in 5 seconds...", 75, 600);
+                    }
+                }
             }
         });
 
@@ -599,56 +603,77 @@ public class Battle extends JFrame implements KeyListener {
         }
 
         battleTimer = new Timer(2500, e -> {
+            switch (battleState) {
+                case PLAYER_MOVE -> {
+                    double multiplier = effectiveCheck(lastMove, opponent);
+                    playerTurn = true;
 
-            if (battleState == BattleState.PLAYER_MOVE) {
-                double multiplier = effectiveCheck(lastMove, opponent);
-                playerTurn = true;
+                    if (multiplier < 1 && multiplier != 0) {
+                        enterBattleState(BattleState.NOT_VERY_EFFECTIVE);
+                    }
 
-                if (multiplier < 1 && multiplier != 0) {
-                    enterBattleState(BattleState.NOT_VERY_EFFECTIVE);
+                    else if (multiplier > 1) {
+                        enterBattleState(BattleState.SUPER_EFFECTIVE);
+                    }
+
+                    else if (multiplier == 0) {
+                        enterBattleState(BattleState.OPPONENT_IMMUNE);
+                    }
+
+                    else {
+
+                        if (opponent.hp == 0) {
+                            enterBattleState(BattleState.OPPONENT_FAINT);
+                        }
+
+                        else {
+                            target = player;
+                            moveUsed(opponent);
+                        }
+                    }
                 }
 
-                else if (multiplier > 1) {
-                    enterBattleState(BattleState.SUPER_EFFECTIVE);
+                case OPPONENT_MOVE -> {
+                    playerTurn = false;
+
+                    double multiplier = effectiveCheck(lastMove, player);
+
+                    if (multiplier < 1 && multiplier != 0) {
+                        enterBattleState(BattleState.NOT_VERY_EFFECTIVE);
+                    }
+
+                    else if (multiplier > 1) {
+                        enterBattleState(BattleState.SUPER_EFFECTIVE);
+                    }
+
+                    else if (multiplier == 0) {
+                        enterBattleState(BattleState.PLAYER_IMMUNE);
+                    }
+
+                    else {
+                        if (player.hp == 0) {
+                            enterBattleState(BattleState.PLAYER_FAINT);
+                        }
+
+                        else {
+                            optionChoice = 0;
+                            enterBattleState(BattleState.FIGHT_BAG_RUN);
+                        }
+                    }
                 }
 
-                else if (multiplier == 0) {
-                    enterBattleState(BattleState.OPPONENT_IMMUNE);
-                }
-
-                else {
-
+                case NOT_VERY_EFFECTIVE, SUPER_EFFECTIVE -> {
                     if (opponent.hp == 0) {
                         enterBattleState(BattleState.OPPONENT_FAINT);
                     }
 
-                    else {
+                    else if (player.hp == 0) {
+                        enterBattleState(BattleState.PLAYER_FAINT);
+                    }
+
+                    else if (playerTurn == true) {
                         target = player;
                         moveUsed(opponent);
-                    }
-                }
-            }
-
-            else if (battleState == BattleState.OPPONENT_MOVE) {
-                playerTurn = false;
-
-                double multiplier = effectiveCheck(lastMove, player);
-
-                if (multiplier < 1 && multiplier != 0) {
-                    enterBattleState(BattleState.NOT_VERY_EFFECTIVE);
-                }
-
-                else if (multiplier > 1) {
-                    enterBattleState(BattleState.SUPER_EFFECTIVE);
-                }
-
-                else if (multiplier == 0) {
-                    enterBattleState(BattleState.PLAYER_IMMUNE);
-                }
-
-                else {
-                    if (player.hp == 0) {
-                        enterBattleState(BattleState.PLAYER_FAINT);
                     }
 
                     else {
@@ -656,68 +681,47 @@ public class Battle extends JFrame implements KeyListener {
                         enterBattleState(BattleState.FIGHT_BAG_RUN);
                     }
                 }
-            }
 
-            else if (battleState == BattleState.NOT_VERY_EFFECTIVE || battleState == BattleState.SUPER_EFFECTIVE) {
-                if (opponent.hp == 0) {
-                    enterBattleState(BattleState.OPPONENT_FAINT);
+                case PLAYER_IMMUNE -> {
+                    optionChoice = 0;
+                    enterBattleState(BattleState.FIGHT_BAG_RUN);
                 }
 
-                else if (player.hp == 0) {
-                    enterBattleState(BattleState.PLAYER_FAINT);
-                }
-
-                else if (playerTurn == true) {
+                case OPPONENT_IMMUNE -> {
                     target = player;
                     moveUsed(opponent);
                 }
 
-                else {
-                    optionChoice = 0;
-                    enterBattleState(BattleState.FIGHT_BAG_RUN);
+                case PLAYER_FAINT -> {
+                    enterBattleState(BattleState.OPPONENT_WIN);
+                }
+
+                case OPPONENT_FAINT -> {
+                    enterBattleState(BattleState.PLAYER_WIN);
+                }
+
+                case PLAYER_WIN -> {
+
+                    Timer toMenu = new Timer(5000, er -> {
+                        window.removeKeyListener(this);
+                        window.showMainMenu();
+                    });
+                    
+                    toMenu.setRepeats(false);
+                    toMenu.start();
+                }
+
+                case OPPONENT_WIN -> {
+                    
+                    Timer toMenu = new Timer(5000, er -> {
+                        window.removeKeyListener(this);
+                        window.showMainMenu();
+                    });
+                    
+                    toMenu.setRepeats(false);
+                    toMenu.start();
                 }
             }
-
-            else if (battleState == BattleState.PLAYER_IMMUNE) {
-                optionChoice = 0;
-                enterBattleState(BattleState.FIGHT_BAG_RUN);
-            }
-
-            else if (battleState == BattleState.OPPONENT_IMMUNE) {
-                target = player;
-                moveUsed(opponent);
-            }
-
-            else if (battleState == BattleState.PLAYER_FAINT) {
-                enterBattleState(BattleState.OPPONENT_WIN);
-            }
-
-            else if (battleState == BattleState.OPPONENT_FAINT) {
-                enterBattleState(BattleState.PLAYER_WIN);
-            }
-
-            else if (battleState == BattleState.PLAYER_WIN) {
-
-                Timer toMenu = new Timer(5000, er -> {
-                    window.removeKeyListener(this);
-                    window.showMainMenu();
-                });
-                
-                toMenu.setRepeats(false);
-                toMenu.start();
-            }
-
-            else if (battleState == BattleState.OPPONENT_WIN) {
-                
-                Timer toMenu = new Timer(5000, er -> {
-                    window.removeKeyListener(this);
-                    window.showMainMenu();
-                });
-                
-                toMenu.setRepeats(false);
-                toMenu.start();
-            }
-
         });
 
         battleTimer.setRepeats(false);
