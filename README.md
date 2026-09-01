@@ -15,13 +15,20 @@ This repo also contains version 3 of TerminalRPG, as
 
 1. The first version was terminal-based
 2. The second version had a working GUI, but without super effective and not very effective dialogue, code was also a mess
-3. The current version includes super effective and not very effective dialogue, a working bag with potions and Pokeballs, and a massive refactoring as to the state tracking and display system.
+3. The third version included super effective and not very effective dialogue, a working bag with potions and Pokeballs, and a massive refactoring as to the state tracking and display system.
+4. The fourth version is just the third version, but with an exe file.
 
 ## Usage
-From the folder that the repo is present in,
+Decompress TerminalRPG_v4-application.zip and run the exe.
 
-    javac -d bin -cp "lib\sqlite-jdbc-3.50.3.0.jar" src\*.java
-    java -cp "bin;lib\sqlite-jdbc-3.50.3.0.jar" TerminalRPG_v3.src.Game_3 
+If you want to make your own changes, to compile, from the folder that the source code is present in,
+
+    javac -Xlint:deprecation  -d build\classes -cp "lib\sqlite-jdbc-3.50.3.0.jar" src\*.java
+    java -cp "build\classes;lib\sqlite-jdbc-3.50.3.0.jar" TerminalRPG_v4.src.Game_4
+
+To make your own .jar file named Game.jar for the entire project after compiling,
+
+    jar cvfm Game.jar manifest.txt -C .\build\classes TerminalRPG_v4
 
 Yes, src should NOT be in the package name for the system.
 

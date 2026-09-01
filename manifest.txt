@@ -1,0 +1,2 @@
+Main-Class: TerminalRPG_v4.src.Game_4
+Class-Path: lib\sqlite-jdbc-3.50.3.0.jar

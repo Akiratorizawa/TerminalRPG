@@ -1,4 +1,4 @@
-package TerminalRPG_v3.src;
+package TerminalRPG_v4.src;
 
 public class Move {
     private String move;

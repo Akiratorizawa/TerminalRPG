@@ -1,4 +1,4 @@
-package TerminalRPG_v3.src;
+package TerminalRPG_v4.src;
 
 import javax.swing.*;
 import java.awt.*;

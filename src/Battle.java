@@ -1,4 +1,4 @@
-package TerminalRPG_v3.src;
+package TerminalRPG_v4.src;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.io.File;
 
-import static TerminalRPG_v3.src.Database.pokemonFetcher;
-import static TerminalRPG_v3.src.Database.spriteFetcher;
-import static TerminalRPG_v3.src.Database.effectiveCheck;
+import static TerminalRPG_v4.src.Database.pokemonFetcher;
+import static TerminalRPG_v4.src.Database.spriteFetcher;
+import static TerminalRPG_v4.src.Database.effectiveCheck;
 
 
 public class Battle extends JFrame implements KeyListener {
