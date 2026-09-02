@@ -1,5 +1,8 @@
 package com.dominic.terminalrpg;
 
+import de.gurkenlabs.input4j.InputDevice;
+import de.gurkenlabs.input4j.components.XInput;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.Window;
@@ -7,10 +10,20 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Battle extends JFrame implements KeyListener {
     // Initializing paint elements
     private final com.dominic.terminalrpg.Window window;
+
+    private Thread controllerThread;
+    private InputDevice controller;
+    private boolean controllerThreadOpen = false;
+
+    private Runnable dpadLeft;
+    private Runnable dpadRight;
+    private Runnable buttonA;
+    private Runnable buttonB;
 
     private int windowWidth;
     private int windowHeight;
@@ -86,6 +99,9 @@ public class Battle extends JFrame implements KeyListener {
     public Battle(com.dominic.terminalrpg.Window window) {
         // Making this the window
         this.window = window;
+
+        // Getting the controller connected
+        controller = window.controller;
 
         // Initializing the background and the cursor arrow
         background = new ImageIcon("assets/img/battle.png").getImage();
@@ -389,10 +405,23 @@ public class Battle extends JFrame implements KeyListener {
                             g.drawImage(pokeballs.items().get(0).image(), getRelativeWidth(870), getRelativeHeight(205), getRelativeWidth(70), getRelativeHeight(70), this);
                         }
                         g.drawString("You won the fight! Returning in 5 seconds...", getRelativeWidth(80), getRelativeHeight(600));
+                        controller.removeButtonPressedListener(dpadLeft);
+                        controller.removeButtonPressedListener(dpadRight);
+                        controller.removeButtonPressedListener(buttonA);
+                        controller.removeButtonPressedListener(buttonB);
+
+                        controllerThread.interrupt();
                     }
 
                     case OPPONENT_WIN -> {
                         g.drawString("You lost the fight. Returning in 5 seconds...", getRelativeWidth(75), getRelativeHeight(600));
+
+                        controller.removeButtonPressedListener(dpadLeft);
+                        controller.removeButtonPressedListener(dpadRight);
+                        controller.removeButtonPressedListener(buttonA);
+                        controller.removeButtonPressedListener(buttonB);
+
+                        controllerThread.interrupt();
                     }
                 }
             }
@@ -419,6 +448,9 @@ public class Battle extends JFrame implements KeyListener {
         firstDialogueTimer.setRepeats(false);
         firstDialogueTimer.start();
 
+        if (controller != null) {
+            controllerInput();
+        }
 
     }
 
@@ -428,12 +460,12 @@ public class Battle extends JFrame implements KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
 
             if (battleState == BattleState.FIGHT_BAG_RUN || battleState == BattleState.CHOOSE_MOVE) {
-                
+
                 optionChoice--;
 
                 if (optionChoice < 0) {
                     optionChoice = 0;
-                } 
+                }
 
                 else {
                     window.optionSound();
@@ -884,6 +916,174 @@ public class Battle extends JFrame implements KeyListener {
 
     public int getRelativeHeight(int y) {
         return (int) (((double) y / 720.0) * (windowHeight + 39));
+    }
+
+    public void controllerInput() {
+
+        dpadLeft = () -> {
+            if (battleState == BattleState.FIGHT_BAG_RUN || battleState == BattleState.CHOOSE_MOVE) {
+
+                optionChoice--;
+
+                if (optionChoice < 0) {
+                    optionChoice = 0;
+                }
+
+                else {
+                    window.optionSound();
+                }
+
+                window.repaint();
+            }
+
+            else if (battleState == BattleState.BAG_POKEBALLS) {
+                optionChoice = 0;
+                battleState = BattleState.BAG_ITEMS;
+
+                window.optionSound();
+                window.repaint();
+            }
+        };
+
+
+        dpadRight = () -> {
+            if (battleState == BattleState.FIGHT_BAG_RUN) {
+
+                optionChoice++;
+
+                if (optionChoice > 2) {
+                    optionChoice = 2;
+                }
+
+                else {
+                    window.optionSound();
+                }
+
+                window.repaint();
+            }
+
+            else if (battleState == BattleState.CHOOSE_MOVE) {
+
+                optionChoice++;
+
+                if (optionChoice > 3) {
+                    optionChoice = 3;
+                }
+
+                else {
+                    window.optionSound();
+                }
+
+                window.repaint();
+            }
+
+            else if (battleState == BattleState.BAG_ITEMS) {
+                optionChoice = 0;
+                battleState = BattleState.BAG_POKEBALLS;
+
+                window.optionSound();
+                window.repaint();
+            }
+        };
+
+        buttonA = () -> {
+            if (battleState == BattleState.FIGHT_BAG_RUN) {
+
+                window.confirmSound();
+
+                if (optionChoice == 2) {
+                    battleState = BattleState.PLAYER_RUN;
+
+                    window.repaint();
+
+                    Timer mainMenuTimer = new Timer(3000, er -> {
+                        window.showMainMenu();
+                    });
+
+                    mainMenuTimer.setRepeats(false);
+                    mainMenuTimer.start();
+                    return;
+                }
+
+                else if (optionChoice == 1) {
+                    optionChoice = 0;
+                    battleState = BattleState.BAG_ITEMS;
+
+                    window.repaint();
+                }
+
+                else {
+                    battleState = BattleState.CHOOSE_MOVE;
+                    window.repaint();
+                    return;
+                }
+            }
+
+            else if (battleState == BattleState.CHOOSE_MOVE) {
+                window.confirmSound();
+                target = opponent;
+                moveUsed(player);
+
+                return;
+            }
+
+            else if (battleState == BattleState.BAG_ITEMS) {
+                if (optionChoice == 0 && items.items().get(0).quantity > 0) {
+                    window.confirmSound();
+                    potionUsed();
+                }
+            }
+
+            else if (battleState == BattleState.BAG_POKEBALLS) {
+                if (optionChoice == 0 && pokeballs.items().get(0).quantity > 0) {
+                    pokeballs.items().get(0).quantity--;
+
+                    pokeballShakes = 0;
+                    window.confirmSound();
+
+                    Timer timer = new Timer(225, er1 -> {
+                        window.pokeballThrowSound();
+                    });
+
+                    timer.setRepeats(false);
+                    timer.start();
+
+                    pokeballUsed(BattleState.POKEBALL_USED);
+                }
+            }
+        };
+
+        buttonB = () -> {
+            if (battleState == BattleState.CHOOSE_MOVE || battleState == BattleState.BAG_ITEMS || battleState == BattleState.BAG_POKEBALLS) {
+                optionChoice = 0;
+                battleState = BattleState.FIGHT_BAG_RUN;
+
+                window.backSound();
+                window.repaint();
+            }
+        };
+
+        controller.onButtonPressed(XInput.DPAD_LEFT, dpadLeft);
+        controller.onButtonPressed(XInput.DPAD_RIGHT, dpadRight);
+        controller.onButtonPressed(XInput.A, buttonA);
+        controller.onButtonPressed(XInput.B, buttonB);
+
+
+        controllerThread = new Thread(this::pollController);
+        controllerThreadOpen = true;
+        controllerThread.start();
+
+    }
+
+    public void pollController () {
+        try {
+            while (controllerThreadOpen) {
+                controller.poll();
+                Thread.sleep(30);
+            }
+        } catch (InterruptedException e) {
+            return;
+        }
     }
 }
 

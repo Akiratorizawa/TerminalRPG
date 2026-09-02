@@ -1,5 +1,7 @@
 package com.dominic.terminalrpg;
 
+import de.gurkenlabs.input4j.InputDevice;
+
 import java.awt.Dimension;
 import java.io.File;
 
@@ -11,12 +13,17 @@ import javax.swing.*;
 
 public class Window extends JFrame {
 
+    public InputDevice controller;
+
     private Clip menuMusic;
     private Clip battleMusic;
     private Clip winMusic;
     private Clip hpSound;
 
-    public Window() {
+
+    public Window(InputDevice controller) {
+
+      this.controller = controller;
 
       setTitle("Valorant");
       setDefaultCloseOperation(EXIT_ON_CLOSE);
