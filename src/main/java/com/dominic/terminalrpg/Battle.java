@@ -5,12 +5,10 @@ import de.gurkenlabs.input4j.components.XInput;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.Window;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.io.File;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Battle extends JFrame implements KeyListener {
     // Initializing paint elements
@@ -405,23 +403,18 @@ public class Battle extends JFrame implements KeyListener {
                             g.drawImage(pokeballs.items().get(0).image(), getRelativeWidth(870), getRelativeHeight(205), getRelativeWidth(70), getRelativeHeight(70), this);
                         }
                         g.drawString("You won the fight! Returning in 5 seconds...", getRelativeWidth(80), getRelativeHeight(600));
-                        controller.removeButtonPressedListener(dpadLeft);
-                        controller.removeButtonPressedListener(dpadRight);
-                        controller.removeButtonPressedListener(buttonA);
-                        controller.removeButtonPressedListener(buttonB);
+                        if (controller != null) {
+                            removeControllerListeners();
+                        }
 
-                        controllerThread.interrupt();
                     }
 
                     case OPPONENT_WIN -> {
                         g.drawString("You lost the fight. Returning in 5 seconds...", getRelativeWidth(75), getRelativeHeight(600));
 
-                        controller.removeButtonPressedListener(dpadLeft);
-                        controller.removeButtonPressedListener(dpadRight);
-                        controller.removeButtonPressedListener(buttonA);
-                        controller.removeButtonPressedListener(buttonB);
-
-                        controllerThread.interrupt();
+                        if (controller != null) {
+                            removeControllerListeners();
+                        }
                     }
                 }
             }
@@ -1084,6 +1077,15 @@ public class Battle extends JFrame implements KeyListener {
         } catch (InterruptedException e) {
             return;
         }
+    }
+
+    public void removeControllerListeners() {
+        controller.removeButtonPressedListener(dpadLeft);
+        controller.removeButtonPressedListener(dpadRight);
+        controller.removeButtonPressedListener(buttonA);
+        controller.removeButtonPressedListener(buttonB);
+
+        controllerThread.interrupt();
     }
 }
 

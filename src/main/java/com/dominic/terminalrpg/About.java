@@ -57,9 +57,11 @@ public class About extends JFrame implements KeyListener {
             window.removeKeyListener(this);
             window.showMainMenu();
 
-            controller.removeButtonPressedListener(buttonB);
+            if (controller != null) {
+                controller.removeButtonPressedListener(buttonB);
 
-            controllerThread.interrupt();
+                controllerThread.interrupt();
+            }
         }
       }
 

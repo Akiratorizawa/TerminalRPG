@@ -1,9 +1,7 @@
 package com.dominic.terminalrpg;
 
-
 import de.gurkenlabs.input4j.InputDevice;
 import de.gurkenlabs.input4j.components.XInput;
-import de.gurkenlabs.input4j.foreign.windows.xinput.XInputButton;
 
 import javax.swing.*;
 import java.awt.*;
@@ -127,12 +125,13 @@ public class mainMenu extends JFrame implements KeyListener {
             window.showBattle();
           }
 
-        controller.removeButtonPressedListener(dpadUp);
-        controller.removeButtonPressedListener(dpadDown);
-        controller.removeButtonPressedListener(buttonA);
+          if (controller != null ) {
+              controller.removeButtonPressedListener(dpadUp);
+              controller.removeButtonPressedListener(dpadDown);
+              controller.removeButtonPressedListener(buttonA);
 
-        controllerThread.interrupt();
-
+              controllerThread.interrupt();
+          }
         }
       }
 
