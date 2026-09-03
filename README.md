@@ -23,12 +23,10 @@ This repo also contains version 4 of TerminalRPG, as
 1. The first version was terminal-based
 2. The second version had a working GUI, but without super effective and not very effective dialogue, code was also a mess
 3. The third version included super effective and not very effective dialogue, a working bag with potions and Pokeballs, and a massive refactoring as to the state tracking and display system.
-4. The fourth version is just the third version, but with an exe file, and XInput controller support.
+4. The fourth version is just the third version, but with XInput controller support.
 
 ## Usage
-Decompress TerminalRPG_v4.1.0-application.zip and run the exe.
-
-To make your own changes, decompress TerminalRPG_v4.1.0-source, and change the source code under src/main/java/com/dominic/terminalrpg.
+Decompress TerminalRPG_v4.1.0-application.zip and run the jar using: `java -jar TerminalRPG_v4.1.0.jar`
 
 ## Personal Context
 Anyways, this is just a personal passion project I made for fun trying to learn Java and OOP along the way. 
