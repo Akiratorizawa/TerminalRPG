@@ -3,11 +3,10 @@
 ## A Pokemon battle simulator in Java (Maven), utilizing JFrame, JPanel, and a state-driven display system.
 
 
-## Instructions (for Sir. Race, Maven needed)
-1. Download TerminalRPG.v4.1.0-source from Releases.
+## Instructions (for Sir. Race)
+1. In releases, the source code is in TerminalRPG.v4.1.0-source.zip. TerminalRPG.v4.1.0-application.zip contains the application itself.
 2. The source code (all .java files) is under src/main/java/com/dominic/terminalrpg.
-3. To run the program, run Main.java, from the TerminalRPG folder itself, NOT from src/main/java/com/dominic/terminalrpg.
-   - Or alternatively, run target/TerminalRPG-4.1.0.jar
+3. To run the program, run the program, run TerminalRPG-4.1.0.jar, from the TerminalRPG.v4.1.0-application folder.
 
 
 ## History
