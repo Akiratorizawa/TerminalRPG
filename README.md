@@ -7,6 +7,7 @@
 1. In releases, the source code is in TerminalRPG.v4.1.0-source.zip. TerminalRPG.v4.1.0-application.zip contains the application itself.
 2. The source code (all .java files) is under src/main/java/com/dominic/terminalrpg.
 3. To run the program, run the program, run TerminalRPG-4.1.0.jar, from the TerminalRPG.v4.1.0-application folder.
+4. Controls are the arrow keys, and enter/escape for select/back. XInput controllers are also supported, but they must be connected at runtime.
 
 
 ## History
